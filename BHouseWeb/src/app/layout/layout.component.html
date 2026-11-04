@@ -1,0 +1,47 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/recipes" aria-label="BHouse home">
+      <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M4 14.5 16 5l12 9.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M7.5 13v13.5h17V13M13 26.5v-8h6v8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+            stroke-linejoin="round" />
+        </svg></span>
+      <span class="brand-name">BHouse<small>RECIPES & COSTING</small></span>
+      </a>
+
+    <div class="nav-label">RECIPE WORKSPACE</div>
+    <nav aria-label="Main navigation">
+      <a routerLink="/recipes" routerLinkActive="active">
+        <span class="nav-icon">⌂</span><span>Recipes</span>
+      </a>
+      <a routerLink="/ingredients" routerLinkActive="active">
+        <span class="nav-icon">▤</span><span>Ingredients</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-bottom">
+      <div class="profile">
+        <div class="avatar">{{ (user?.name || user?.email || 'U').charAt(0).toUpperCase() }}</div>
+        <div class="profile-details"><strong>{{ user?.name || 'ผู้ใช้งาน' }}</strong><small>{{ user?.email || 'ไม่พบอีเมล' }}</small></div>
+      </div>
+      @if (logoutErrorMessage) {
+        <p class="logout-error" role="alert">{{ logoutErrorMessage }}</p>
+      }
+      <button class="sign-out" type="button" (click)="signOut()" [disabled]="signingOut">
+        ↗ <span>{{ signingOut ? 'Signing out...' : logoutErrorMessage ? 'Try again' : 'Sign out' }}</span>
+      </button>
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <header class="topbar">
+      <div class="mobile-brand"><span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 14.5 16 5l12 9.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.5 13v13.5h17V13M13 26.5v-8h6v8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M20.5 12.5c0-1.1.8-1.8 1.7-1.8.8 0 1.3.4 1.6 1 .3-.6.8-1 1.6-1 .9 0 1.7.7 1.7 1.8 0 1.4-1.8 2.4-3.3 3.5-1.5-1.1-3.3-2.1-3.3-3.5Z" fill="#d78c9c"/></svg></span> BHouse</div>
+      <div class="breadcrumb">YOUR RECIPES <span>/</span> <strong>COST & SELLING PRICE</strong></div>
+      <div class="topbar-right"><span class="status-dot"></span> Recipes to profitable batches</div>
+    </header>
+    <section class="page-content">
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>

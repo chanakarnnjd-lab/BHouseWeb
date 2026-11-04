@@ -1,0 +1,84 @@
+<section class="recipe-form-page">
+  <a class="back-link" routerLink="/recipes">← Back to recipes</a>
+
+  @if (missingRecipe) {
+    <div class="form-card not-found">
+      <span class="form-icon">!</span>
+      <h1>Recipe not found</h1>
+      <p>It may have been removed or the link may be incorrect.</p>
+      <a class="primary-button" routerLink="/recipes">View recipes</a>
+    </div>
+  } @else if (loading) {
+    <div class="form-card loading-state">Loading form data...</div>
+  } @else {
+    <div class="form-heading">
+      <div class="eyebrow">{{ isEditing ? 'UPDATE YOUR RECIPE BOOK' : 'ADD TO YOUR RECIPE BOOK' }}</div>
+      <h1>{{ isEditing ? 'Edit recipe' : 'Add a recipe' }} <span>✳</span></h1>
+      <p>{{ isEditing ? 'Update your menu and costing details.' : 'Save a menu with its ingredients and pricing details.' }}</p>
+    </div>
+
+    <form class="form-card" (ngSubmit)="save()" #recipeForm="ngForm">
+      <div class="form-section-title"><span class="form-icon">🥘</span><div><strong>Recipe details</strong><small>Menu and pricing information.</small></div></div>
+
+      <label class="field">
+        <span>Menu name <b>*</b></span>
+        <input name="menu" [(ngModel)]="menu" placeholder="e.g. Chocolate chip cookies" required maxlength="100" autocomplete="off">
+      </label>
+
+      <label class="field">
+        <span>Recipe image URL</span>
+        <input name="imageUrl" [(ngModel)]="imageUrl" type="url" placeholder="https://example.com/image.jpg" maxlength="100">
+      </label>
+
+      <div class="field-row">
+        <label class="field">
+          <span>Profit margin (%) <b>*</b></span>
+          <input name="margin" type="number" [(ngModel)]="margin" min="0" step="1" required>
+        </label>
+        <label class="field">
+          <span>Additional cost per unit <b>*</b></span>
+          <input name="additionalCostPerUnit" type="number" [(ngModel)]="additionalCostPerUnit" min="0.01" step="any" required>
+        </label>
+      </div>
+
+      <label class="field">
+        <span>Servings <b>*</b></span>
+        <input name="servings" type="number" [(ngModel)]="servings" min="1" step="1" required>
+      </label>
+
+      <div class="form-section-title ingredient-section-title">
+        <span class="form-icon">🥬</span>
+        <div><strong>Recipe ingredients</strong><small>Select ingredients and enter the quantity used.</small></div>
+      </div>
+
+      @for (row of ingredientRows; track row; let index = $index) {
+        <div class="ingredient-row">
+          <label class="field">
+            <span>Ingredient <b>*</b></span>
+            <select [name]="'ingredient-' + index" [(ngModel)]="row.itemId" required>
+              <option [ngValue]="null" disabled>Select an ingredient</option>
+              @for (ingredient of ingredients; track ingredient.id) {
+                <option [ngValue]="ingredient.id">{{ ingredient.name }} ({{ ingredient.unitName }})</option>
+              }
+            </select>
+          </label>
+          <label class="field">
+            <span>Quantity <b>*</b></span>
+            <input [name]="'quantity-' + index" type="number" [(ngModel)]="row.quantity" min="1" step="1" required>
+          </label>
+          <button class="remove-ingredient" type="button" (click)="removeIngredient(index)" [attr.aria-label]="'Remove ingredient ' + (index + 1)">×</button>
+        </div>
+      }
+      <button class="add-ingredient" type="button" (click)="addIngredient()" [disabled]="ingredients.length === 0">＋ Add ingredient</button>
+      @if (ingredients.length === 0 && !errorMessage) {
+        <p class="form-hint">Add ingredients first before including them in a recipe.</p>
+      }
+
+      @if (errorMessage) { <div class="error-message" role="alert">{{ errorMessage }}</div> }
+      <div class="form-actions">
+        <a class="cancel-button" routerLink="/recipes">Cancel</a>
+        <button class="primary-button" type="submit" [disabled]="recipeForm.invalid || saving || ingredients.length === 0">{{ saving ? 'Saving...' : isEditing ? 'Save changes' : 'Add recipe' }}</button>
+      </div>
+    </form>
+  }
+</section>

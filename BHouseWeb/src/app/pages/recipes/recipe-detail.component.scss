@@ -1,0 +1,39 @@
+.recipe-detail-page { max-width: 900px; margin: 0 auto; }
+.back-link { display: inline-block; margin-bottom: 24px; color: #9c656e; font-size: 11px; font-weight: 600; }
+.back-link:hover { color: #87575e; }
+.recipe-detail-card { overflow: hidden; border: 1px solid #eee4df; border-radius: 14px; background: #fffdfb; }
+.recipe-hero { display: grid; place-items: center; height: 300px; overflow: hidden; background: #f8e9e9; }
+.recipe-hero img { width: 100%; height: 100%; object-fit: cover; }
+.recipe-hero > span { font-size: 90px; }
+.recipe-content { padding: 28px 32px 32px; }
+.eyebrow { color: #829186; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; }
+h1 { margin: 9px 0 22px; color: #594541; font-size: 30px; letter-spacing: -.8px; }
+.recipe-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.recipe-stats > div { display: grid; gap: 7px; padding: 14px; border-radius: 9px; background: #fbf3ee; }
+.recipe-stats span { color: #89958b; font-size: 10px; }
+.recipe-stats strong { color: #684c48; font-size: 14px; }
+.ingredients-section { margin-top: 28px; }
+.ingredients-section h2 { display: flex; align-items: center; gap: 9px; margin: 0 0 12px; color: #684c48; font-size: 15px; }
+.ingredients-section h2 span { display: grid; place-items: center; min-width: 21px; height: 21px; padding: 0 5px; border-radius: 11px; background: #f8e9e9; color: #9c656e; font-size: 10px; }
+.ingredient-list { margin: 0; padding: 0; border-top: 1px solid #f0e7e2; list-style: none; }
+.ingredient-list li { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 12px 2px; border-bottom: 1px solid #f0e7e2; }
+.ingredient-list li > span:first-child { display: grid; gap: 4px; }
+.ingredient-list strong { color: #684c48; font-size: 11px; }
+.ingredient-list small, .no-ingredients { color: #8b968d; font-size: 10px; }
+.ingredient-price { color: #8b625f; font-size: 11px; font-weight: 700; }
+.no-ingredients { margin: 0; padding: 13px 0; }
+.detail-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; padding-top: 18px; border-top: 1px solid #f0e7e2; }
+.delete-button, .edit-button, .primary-button { display: inline-flex; align-items: center; justify-content: center; min-height: 39px; padding: 0 15px; border-radius: 7px; font-size: 10px; font-weight: 700; }
+.delete-button { border: 1px solid #eadbd7; background: white; color: #a64e3c; cursor: pointer; }
+.delete-button:hover:not(:disabled) { background: #fbefeb; }
+.delete-button:disabled { cursor: not-allowed; opacity: .58; }
+.edit-button, .primary-button { border: 0; background: #a56d76; color: white; }
+.edit-button:hover, .primary-button:hover { background: #87575e; }
+.state-card { padding: 40px 20px; border: 1px solid #eee4df; border-radius: 12px; background: #fffdfb; color: #947f79; text-align: center; font-size: 12px; }
+.state-card h1 { margin: 14px 0 8px; color: #594541; font-size: 22px; }
+.state-card p { margin: 0; color: #8b968d; font-size: 12px; }
+.state-icon { display: grid; place-items: center; width: 39px; height: 39px; margin: 0 auto; border-radius: 11px; background: #f8e9e9; color: #9c656e; font-size: 19px; }
+.state-card .primary-button { margin-top: 22px; }
+.error-message { padding: 11px 12px; border-radius: 7px; background: #fbefeb; color: #a64e3c; font-size: 10px; text-align: left; }
+.detail-actions + .error-message { margin-top: 12px; }
+@media (max-width: 520px) { .recipe-hero { height: 210px; }.recipe-content { padding: 21px 16px; }h1 { font-size: 25px; }.recipe-stats { gap: 7px; }.recipe-stats > div { padding: 10px 8px; }.recipe-stats span { font-size: 9px; }.recipe-stats strong { font-size: 12px; }.detail-actions { justify-content: stretch; }.detail-actions > * { flex: 1; } }

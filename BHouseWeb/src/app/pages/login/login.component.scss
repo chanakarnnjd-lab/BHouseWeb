@@ -1,0 +1,60 @@
+:host { display: block; min-height: 100vh; }
+.login-page { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; background: #fffaf6; }
+.story-panel { position: relative; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; min-height: 100vh; padding: 38px 9%; background: #795b57; color: #fffaf6; }
+.brand { display: flex; align-items: center; gap: 10px; width: fit-content; font-size: 18px; font-weight: 800; }
+.brand-mark { display: grid; place-items: center; width: 37px; height: 37px; border-radius: 12px; background: #fff5f1; color: #8c6260; }
+.brand-mark svg { width: 27px; height: 27px; }
+.story-copy { position: relative; z-index: 1; max-width: 490px; margin: auto 0; padding: 30px 0 58px; }
+.eyebrow, .welcome { font-size: 10px; font-weight: 700; letter-spacing: 1.7px; }
+.eyebrow { color: #f0d9d4; }
+.eyebrow span { display: inline-block; width: 19px; height: 1px; margin: 0 8px 3px 0; background: #e8b8b8; }
+h1 { margin: 23px 0 17px; font-size: clamp(42px, 5vw, 66px); line-height: 1.07; letter-spacing: -2.7px; }
+h1 em { color: #f2c8c4; font-family: Georgia, serif; font-weight: 400; }
+.story-copy p { max-width: 360px; color: #f0dfda; font-size: 14px; line-height: 1.8; }
+.kitchen-note { z-index: 1; display: flex; align-items: center; gap: 13px; width: fit-content; padding: 13px 18px 13px 14px; border: 1px solid rgba(255,255,255,.18); border-radius: 12px; background: rgba(255,255,255,.07); }
+.kitchen-note > span { color: #f0c2bd; font-size: 22px; }
+.kitchen-note strong, .kitchen-note small { display: block; }
+.kitchen-note strong { font-size: 11px; }
+.kitchen-note small { margin-top: 4px; color: #e9d5d0; font-size: 10px; }
+.decor { position: absolute; color: rgba(255,255,255,.05); }
+.decor-one { right: 4%; top: 16%; font-size: 235px; }
+.decor-two { right: 13%; bottom: 20%; font-size: 125px; color: rgba(242,200,196,.16); }
+.form-panel { display: grid; place-items: center; padding: 50px 9%; }
+.login-form-wrap { width: min(100%, 390px); }
+.welcome { color: #9c8580; }
+.welcome span { margin-left: 6px; color: #c88991; }
+h2 { margin: 15px 0 8px; color: #594541; font-size: 33px; letter-spacing: -1.2px; }
+.intro { margin: 0 0 35px; color: #9b8983; font-size: 13px; }
+form label { display: block; margin: 0 0 9px; color: #6d5952; font-size: 11px; font-weight: 700; }
+input { width: 100%; height: 48px; margin-bottom: 21px; padding: 0 14px; border: 1px solid #eee1dc; border-radius: 8px; outline: 0; background: #fffdfb; color: #594541; font-size: 12px; transition: border-color .2s, box-shadow .2s; }
+input:focus { border-color: #c88991; box-shadow: 0 0 0 3px #f8e9e9; }
+input::placeholder { color: #b2bab3; }
+.password-input { position: relative; }
+.password-input input { padding-right: 64px; }
+.password-toggle { position: absolute; top: 0; right: 9px; display: grid; place-items: center; width: 36px; height: 48px; min-height: 0; margin: 0; padding: 0; border: 0; background: transparent; color: #a56d76; }
+.password-toggle:focus-visible { border-radius: 4px; outline: 2px solid #c88991; outline-offset: 1px; }
+.password-label { display: flex; align-items: center; justify-content: space-between; }
+.password-label a { margin-bottom: 9px; color: #9c656e; font-size: 10px; font-weight: 600; }
+form > button { display: flex; align-items: center; justify-content: space-between; width: 100%; height: 49px; margin-top: 4px; padding: 0 16px; border: 0; border-radius: 8px; background: #a56d76; color: white; font-size: 12px; font-weight: 700; transition: background .2s; }
+form > button:not(:disabled):hover { background: #87575e; }
+form > button:disabled { cursor: not-allowed; opacity: .58; }
+form > button span { font-size: 18px; }
+.login-error { margin: -4px 0 12px; padding: 11px 12px; border-radius: 7px; background: #fbefeb; color: #a64e3c; font-size: 10px; line-height: 1.5; }
+.signup { margin: 23px 0 0; color: #89938b; text-align: center; font-size: 11px; }
+.signup a { color: #9c656e; font-weight: 700; }
+.privacy { margin-top: 72px; padding-top: 21px; border-top: 1px solid #f0e7e2; color: #9c8983; text-align: center; font-size: 10px; }
+.privacy span { margin-right: 5px; color: #c88991; }
+@media (max-width: 700px) {
+  .login-page { grid-template-columns: 1fr; }
+  .story-panel { min-height: 300px; padding: 22px 25px; }
+  .brand { font-size: 15px; }
+  .brand-mark { width: 31px; height: 31px; }
+  .brand-mark svg { width: 23px; height: 23px; }
+  .story-copy { padding: 35px 0 7px; }
+  h1 { margin: 15px 0 9px; font-size: 39px; }
+  .story-copy p { display: none; }
+  .eyebrow { font-size: 9px; }
+  .kitchen-note, .decor { display: none; }
+  .form-panel { padding: 40px 25px 28px; }
+  .privacy { margin-top: 43px; }
+}

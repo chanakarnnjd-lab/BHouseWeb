@@ -1,0 +1,61 @@
+<section class="recipe-detail-page">
+  <a class="back-link" routerLink="/recipes">← Back to recipes</a>
+
+  @if (loading) {
+    <div class="state-card">Loading recipe...</div>
+  } @else if (missingRecipe) {
+    <div class="state-card not-found">
+      <span class="state-icon">!</span>
+      <h1>Recipe not found</h1>
+      <p>It may have been removed or the link may be incorrect.</p>
+      <a class="primary-button" routerLink="/recipes">View recipes</a>
+    </div>
+  } @else if (errorMessage && !recipe) {
+    <div class="state-card error-message" role="alert">{{ errorMessage }}</div>
+  } @else if (recipe) {
+    <article class="recipe-detail-card">
+      <div class="recipe-hero">
+        @if (recipe.imageUrl) {
+          <img [src]="recipe.imageUrl" [alt]="recipe.menu">
+        } @else {
+          <span aria-hidden="true">🥘</span>
+        }
+      </div>
+      <div class="recipe-content">
+        <div class="eyebrow">RECIPE DETAILS</div>
+        <h1>{{ recipe.menu }}</h1>
+
+        <div class="recipe-stats">
+          <div><span>Servings</span><strong>{{ recipe.servings }}</strong></div>
+          <div><span>Profit margin</span><strong>{{ recipe.margin }}%</strong></div>
+          <div><span>Additional cost / unit</span><strong>{{ recipe.additionalCostPerUnit | number:'1.2-2' }}</strong></div>
+        </div>
+
+        <section class="ingredients-section">
+          <h2>Ingredients <span>{{ recipe.ingredients.length }}</span></h2>
+          @if (recipe.ingredients.length) {
+            <ul class="ingredient-list">
+              @for (ingredient of recipe.ingredients; track ingredient.id) {
+                <li>
+                  <span><strong>{{ ingredient.name }}</strong><small>Quantity: {{ ingredient.quantity | number:'1.0-2' }}</small></span>
+                  <span class="ingredient-price">{{ ingredient.price | number:'1.2-2' }}</span>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="no-ingredients">No ingredients added yet.</p>
+          }
+        </section>
+
+        @if (errorMessage) { <div class="error-message" role="alert">{{ errorMessage }}</div> }
+
+        <div class="detail-actions">
+          <button class="delete-button" type="button" (click)="deleteRecipe()" [disabled]="deleting">
+            {{ deleting ? 'Deleting...' : 'Delete recipe' }}
+          </button>
+          <a class="edit-button" [routerLink]="['/recipes', recipe.id, 'edit']">Edit recipe</a>
+        </div>
+      </div>
+    </article>
+  }
+</section>

@@ -1,0 +1,58 @@
+<section class="ingredient-form-page">
+  <a class="back-link" routerLink="/ingredients">← Back to ingredients</a>
+
+  @if (missingIngredient) {
+    <div class="form-card not-found">
+      <span class="form-icon">!</span>
+      <h1>Ingredient not found</h1>
+      <p>It may have been removed or the link may be incorrect.</p>
+      <a class="primary-button" routerLink="/ingredients">View ingredients</a>
+    </div>
+  } @else if (loading) {
+    <div class="form-card loading-state">Loading ingredient...</div>
+  } @else {
+    <div class="form-heading">
+      <div class="eyebrow">{{ isEditing ? 'UPDATE YOUR KITCHEN' : 'GROW YOUR COLLECTION' }}</div>
+      <h1>{{ isEditing ? 'Edit ingredient' : 'Add an ingredient' }} <span>✳</span></h1>
+      <p>{{ isEditing ? 'Make a change to something in your kitchen.' : 'Keep track of what you have on hand.' }}</p>
+    </div>
+
+    <form class="form-card" (ngSubmit)="save()" #ingredientForm="ngForm">
+      <div class="form-section-title"><span class="form-icon">🥬</span><div><strong>Ingredient details</strong><small>Tell us a little about it.</small></div></div>
+
+      <label class="field">
+        <span>Ingredient name <b>*</b></span>
+        <input name="name" [(ngModel)]="name" placeholder="e.g. Lemons" required maxlength="80" autocomplete="off">
+      </label>
+
+      <div class="field-row">
+        <label class="field">
+          <span>Quantity <b>*</b></span>
+          <input name="quantity" type="number" [(ngModel)]="quantity" placeholder="e.g. 10" min="0" step="any" required>
+        </label>
+        <label class="field">
+          <span>Unit ID <b>*</b></span>
+          <input name="unitId" type="number" [(ngModel)]="unitId" placeholder="Enter unit ID" min="1" step="1" required>
+          <small>Use a unit ID configured in the API.</small>
+        </label>
+      </div>
+
+      <div class="field-row">
+        <label class="field">
+          <span>Price <b>*</b></span>
+          <input name="price" type="number" [(ngModel)]="price" placeholder="e.g. 25.00" min="0" step="any" required>
+        </label>
+        <label class="field">
+          <span>User ID <b>*</b></span>
+          <input name="userId" [(ngModel)]="userId" placeholder="e.g. admin" required maxlength="80">
+        </label>
+      </div>
+
+      @if (errorMessage) { <div class="error-message" role="alert">{{ errorMessage }}</div> }
+      <div class="form-actions">
+        <a class="cancel-button" routerLink="/ingredients">Cancel</a>
+        <button class="primary-button" type="submit" [disabled]="ingredientForm.invalid || saving">{{ saving ? 'Saving...' : isEditing ? 'Save changes' : 'Add ingredient' }}</button>
+      </div>
+    </form>
+  }
+</section>

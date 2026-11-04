@@ -1,0 +1,42 @@
+.recipe-form-page { max-width: 680px; margin: 0 auto; }
+.back-link { display: inline-block; margin-bottom: 29px; color: #9c656e; font-size: 11px; font-weight: 600; }
+.back-link:hover { color: #87575e; }
+.form-heading { margin-bottom: 23px; }
+.eyebrow { color: #829186; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; }
+.form-heading h1 { margin: 10px 0 7px; color: #594541; font-size: 34px; letter-spacing: -1.4px; }
+.form-heading h1 span { color: #c88991; font-size: 19px; vertical-align: 7px; }
+.form-heading p, .form-card p { margin: 0; color: #8b968d; font-size: 12px; }
+.loading-state { color: #8b968d; font-size: 12px; text-align: center; }
+.form-card { padding: 25px; border: 1px solid #eee4df; border-radius: 12px; background: #fffdfb; }
+.form-section-title { display: flex; align-items: center; gap: 12px; margin-bottom: 25px; padding-bottom: 19px; border-bottom: 1px solid #f0e7e2; }
+.form-icon { display: grid; place-items: center; width: 39px; height: 39px; border-radius: 11px; background: #f8e9e9; color: #9c656e; font-size: 19px; }
+.form-section-title strong, .form-section-title small { display: block; }
+.form-section-title strong { color: #684c48; font-size: 12px; }
+.form-section-title small { margin-top: 4px; color: #9aa49c; font-size: 10px; }
+.field { display: grid; gap: 8px; margin-bottom: 19px; color: #6d5952; font-size: 10px; font-weight: 700; }
+.field > span b { color: #c97752; }
+.field input, .field select { width: 100%; height: 43px; padding: 0 12px; border: 1px solid #eee1dc; border-radius: 7px; outline: none; background: #fffdfb; color: #594541; font-size: 11px; }
+.field input:focus, .field select:focus { border-color: #c88991; box-shadow: 0 0 0 3px #f8e9e9; }
+.field input::placeholder { color: #b2bab3; }
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.ingredient-section-title { margin: 27px 0 18px; }
+.ingredient-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(100px, .55fr) 36px; align-items: end; gap: 12px; }
+.ingredient-row .field { min-width: 0; }
+.remove-ingredient { width: 36px; height: 43px; margin-bottom: 19px; border: 1px solid #eadbd7; border-radius: 7px; background: #fff; color: #a64e3c; font-size: 21px; cursor: pointer; }
+.remove-ingredient:hover { background: #fbefeb; }
+.add-ingredient { margin: 0 0 20px; padding: 8px 11px; border: 1px solid #eadbd7; border-radius: 7px; background: #fff8f4; color: #95636a; font-size: 10px; font-weight: 700; cursor: pointer; }
+.add-ingredient:hover:not(:disabled) { background: #f8e9e9; }
+.add-ingredient:disabled { cursor: not-allowed; opacity: .58; }
+.form-hint { margin: -8px 0 18px !important; color: #929d94 !important; font-size: 10px !important; }
+.error-message { margin: 0 0 14px; padding: 11px 12px; border-radius: 7px; background: #fbefeb; color: #a64e3c; font-size: 10px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 7px; padding-top: 19px; border-top: 1px solid #f0e7e2; }
+.cancel-button, .primary-button { display: inline-flex; align-items: center; justify-content: center; min-height: 39px; padding: 0 15px; border-radius: 7px; font-size: 10px; font-weight: 700; }
+.cancel-button { border: 1px solid #eee1dc; color: #80665e; }
+.cancel-button:hover { background: #fbf3ee; }
+.primary-button { border: 0; background: #a56d76; color: white; cursor: pointer; }
+.primary-button:hover:not(:disabled) { background: #87575e; }
+.primary-button:disabled { cursor: not-allowed; opacity: .58; }
+.not-found { display: grid; justify-items: center; padding: 42px 25px; text-align: center; }
+.not-found h1 { margin: 14px 0 8px; color: #594541; font-size: 22px; }
+.not-found .primary-button { margin-top: 22px; }
+@media (max-width: 520px) { .form-heading h1 { font-size: 29px; }.form-card { padding: 19px 15px; }.field-row { grid-template-columns: 1fr; gap: 0; }.ingredient-row { grid-template-columns: minmax(0, 1fr) minmax(76px, .55fr) 32px; gap: 7px; }.remove-ingredient { width: 32px; }.back-link { margin-bottom: 22px; } }

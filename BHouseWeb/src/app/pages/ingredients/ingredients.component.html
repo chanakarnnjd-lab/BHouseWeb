@@ -1,0 +1,31 @@
+<section class="ingredients-page">
+  <div class="page-heading"><div><div class="eyebrow">YOUR RECIPE COSTING STARTS HERE</div><h1>Ingredients <span>✳</span></h1><p class="page-subtitle">Manage ingredient quantities and prices to work out recipe costs.</p></div><a class="add-button" routerLink="/ingredients/new"><span>＋</span> Add ingredient</a></div>
+  <div class="summary">
+    <div class="summary-icon">▤</div><div><strong>{{ ingredients.length }} ingredients</strong><small>available for recipe costing</small></div>
+    <div class="summary-divider"></div>
+    <div class="value-icon">฿</div><div><strong>{{ totalValue | number:'1.2-2' }}</strong><small>total recorded price</small></div>
+    <div class="summary-decoration">✿</div>
+  </div>
+  <div class="ingredients-toolbar"><div><h2>Ingredient prices</h2><p>Use your ingredient prices when calculating recipe costs.</p></div><div class="page-search"><span>⌕</span><input aria-label="Search ingredients" type="search" [(ngModel)]="searchTerm" placeholder="Search ingredients..."></div></div>
+  <div class="ingredients-list">
+    <div class="list-header"><span>INGREDIENT</span><span>QUANTITY</span><span>UNIT</span><span>PRICE</span><span></span></div>
+    @if (loading) {
+      <div class="empty-state">Loading ingredients...</div>
+    } @else if (errorMessage) {
+      <div class="error-state" role="alert">{{ errorMessage }}</div>
+    } @else {
+      @for (ingredient of filteredIngredients; track ingredient.id) {
+        <article class="ingredient-row">
+          <div class="ingredient-name"><span class="ingredient-emoji">🧺</span><strong>{{ ingredient.name }}</strong></div>
+          <span class="quantity">{{ ingredient.quantity | number:'1.0-2' }}</span>
+          <span class="unit">{{ ingredient.unitName }}</span>
+          <span class="price">{{ ingredient.price | number:'1.2-2' }}</span>
+          <a class="edit-link" [routerLink]="['/ingredients', ingredient.id, 'edit']" [attr.aria-label]="'Edit ' + ingredient.name">Edit</a>
+        </article>
+      } @empty {
+        <div class="empty-state">No ingredients found. Try another search, or add an ingredient to your kitchen.</div>
+      }
+    }
+  </div>
+  <p class="list-note">A little note to self: keep your kitchen stocked with the things you love.</p>
+</section>

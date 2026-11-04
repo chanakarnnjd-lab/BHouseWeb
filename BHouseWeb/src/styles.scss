@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap');
+
+:root {
+  color-scheme: light;
+  font-family: 'DM Sans', 'Nunito Sans', sans-serif;
+  color: #51403d;
+  background: #fffaf6;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+.password-toggle svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-linecap: round; stroke-linejoin: round; stroke-width: 1.7; }
+
+.page-heading { display: flex; align-items: end; justify-content: space-between; }
+.page-heading .eyebrow { color: #9c8580; font-size: 9px; font-weight: 700; letter-spacing: 1.5px; }
+.page-heading h1 { margin: 10px 0 7px; color: #594541; font-size: 38px; letter-spacing: -1.7px; }
+.page-heading h1 span { color: #c98d94; font-size: 21px; vertical-align: 7px; }
+.page-subtitle { margin: 0; color: #9b8983; font-size: 12px; }
+.page-search { display: flex; align-items: center; gap: 8px; width: 207px; height: 37px; padding: 0 11px; border: 1px solid #eee1dc; border-radius: 8px; background: #fffdfb; color: #9c8983; }
+.page-search span { font-size: 20px; }
+.page-search input { width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; color: #594541; font-size: 10px; }
+@media (max-width: 720px) {
+  .page-heading h1 { font-size: 32px; }
+  .page-search { width: 100%; }
+}

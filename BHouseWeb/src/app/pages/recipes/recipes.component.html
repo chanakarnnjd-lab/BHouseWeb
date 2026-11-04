@@ -1,0 +1,44 @@
+<section class="recipes-page">
+  <div class="page-heading">
+    <div><div class="eyebrow">YOUR RECIPE BOOK & COSTING WORKSPACE</div><h1>Recipes <span>✳</span></h1><p class="page-subtitle">Save the recipes you make and keep their costs easy to work out.</p></div>
+    <div class="recipe-count"><strong>{{ recipes.length }}</strong><span>saved recipes</span></div>
+  </div>
+  <div class="feature">
+    <div class="feature-copy"><span class="feature-label">RECIPE COSTING, MADE SIMPLE</span><h2>Know what it costs.<br>Choose what to charge.</h2><p>Track recipe ingredients, servings, and pricing details.</p></div>
+    <div class="feature-plate" aria-hidden="true"><span>🥘</span><i>✳</i></div>
+    <span class="feature-spark">✦</span>
+  </div>
+  <div class="list-heading"><div><h2>Your recipes</h2><p>Keep recipes and pricing notes organized in one place.</p></div><div class="list-actions"><div class="page-search"><span>⌕</span><input aria-label="Search recipes" type="search" [(ngModel)]="searchTerm" placeholder="Find a recipe..."></div><a class="add-recipe-button" routerLink="/recipes/new"><span>＋</span> Add recipe</a></div></div>
+  <div class="recipe-grid">
+    @if (loading) {
+      <div class="collection-state">Loading recipes...</div>
+    } @else if (errorMessage) {
+      <div class="collection-error" role="alert">{{ errorMessage }}</div>
+    } @else {
+    @for (recipe of filteredRecipes; track recipe.id) {
+      <article class="recipe-card">
+        <div class="recipe-art">
+          @if (recipe.imageUrl) {
+            <img [src]="recipe.imageUrl" [alt]="recipe.menu" loading="lazy">
+          } @else {
+            <span>🥘</span>
+          }
+        </div>
+        <div class="recipe-info">
+          <a class="recipe-title" [routerLink]="['/recipes', recipe.id]">{{ recipe.menu }}</a>
+          <div class="recipe-meta"><span>{{ recipe.servings }} servings</span><span>{{ recipe.margin }}% margin</span></div>
+          <div class="recipe-cost">Additional cost / unit <strong>{{ recipe.additionalCostPerUnit | number:'1.2-2' }}</strong></div>
+          <a class="edit-recipe-link" [routerLink]="['/recipes', recipe.id, 'edit']" [attr.aria-label]="'Edit ' + recipe.menu" title="Edit recipe">
+            <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 20h9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+              <path d="m16.5 3.5 4 4L8 20l-5 1 1-5L16.5 3.5Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        </div>
+      </article>
+    } @empty {
+      <div class="empty-state"><span>⌕</span><strong>No recipes found</strong><p>Try a different search term.</p></div>
+    }
+    }
+  </div>
+</section>
