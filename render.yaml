@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: bhouserecipes
+    runtime: static
+    buildCommand: cd BHouseWeb && npm ci && npm run build
+    staticPublishPath: BHouseWeb/dist/bhouse-web/browser
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
