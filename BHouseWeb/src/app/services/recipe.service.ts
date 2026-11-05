@@ -34,7 +34,7 @@ export interface Recipe {
   id: number;
   menu: string;
   margin: number;
-  sellingPrice: number;
+  sellingPrice: number | null;
   servings: number;
   userId: string;
   imageUrl: string | null;
@@ -45,7 +45,7 @@ export interface Recipe {
 export interface RecipeInput {
   menu: string;
   margin: number;
-  acc_unit: number;
+  actualPrice: number | null;
   serve: number;
   userId: string;
   picUrl: string | null;
@@ -125,13 +125,14 @@ export class RecipeService {
   }
 
   private toRecipe(value: unknown): Recipe {
+    console.log("🌺 👁 🫦 👁 🫰 ~ RecipeService ~ toRecipe ~ value:", value)
     if (!this.isRecord(value)) {
       throw new Error('The API returned an invalid recipe.');
     }
 
     const id = this.toNumber(value['recipesId']);
     const margin = this.toNumber(value['margin']);
-    const sellingPrice = this.toNumber(value['acc_unit']);
+    const sellingPrice = this.toNumber(value['actualPrice']);
     const servings = this.toNumber(value['serve']);
     const name = value['menu'];
     const userId = value['userId'];
@@ -140,7 +141,7 @@ export class RecipeService {
     const categories = value['categories'] ?? [];
 
     if (
-      id === null || margin === null || sellingPrice === null || servings === null ||
+      id === null || margin === null || servings === null ||
       typeof name !== 'string' || typeof userId !== 'string' ||
       (imageUrl !== null && imageUrl !== undefined && typeof imageUrl !== 'string') ||
       !Array.isArray(ingredients) || !Array.isArray(categories)

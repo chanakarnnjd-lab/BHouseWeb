@@ -180,21 +180,21 @@ export class RecipeFormComponent implements OnInit {
   }
 
   save(): void {
-    if (
-      this.menu.trim() === '' || this.margin === null || this.sellingPrice === null ||
-      !Number.isInteger(this.margin) || this.margin < 0 || this.margin >= 100 ||
-      this.sellingPrice <= 0 ||
-      this.servings === null || !Number.isInteger(this.servings) || this.servings < 1 ||
-      !this.ingredientRows.every(this.isCompleteIngredientRow)
-    ) {
+    if (this.menu.trim() === '' || !this.ingredientRows.every(this.isCompleteIngredientRow)) {
       return;
+    }
+    if(this.servings === null || !Number.isInteger(this.servings) || this.servings < 1) {
+      this.servings = 1; // Default to 1 if servings is not valid
+    }
+    if(this.margin === null ||!Number.isInteger(this.margin) || this.margin < 0 || this.margin >= 100 ) {
+      this.margin = 0; // Default to 0 if margin is not valid
     }
 
     const ingredientRows: CompleteRecipeIngredientRow[] = this.ingredientRows;
     const recipe: RecipeInput = {
       menu: this.menu.trim(),
       margin: this.margin,
-      acc_unit: this.sellingPrice,
+      actualPrice: this.sellingPrice,
       serve: this.servings,
       userId: this.userId,
       picUrl: this.imageUrl.trim() || null,
