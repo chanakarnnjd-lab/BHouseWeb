@@ -9,7 +9,20 @@ export interface RecipeIngredient {
   quantity: number;
   unitId: number;
   unitName: string;
+  stockQuantity: number | null;
+  inventoryUnitId: number | null;
   price: number;
+}
+
+export interface RecipeIngredientCost {
+  id: number;
+  itemId: number;
+  name: string;
+  quantity: number;
+  unitId: number;
+  unitName: string;
+  costPerUnit: number;
+  totalCost: number;
 }
 
 export interface RecipeCategory {
@@ -68,6 +81,17 @@ export class RecipeService {
           throw new Error(response.message || 'The API could not find this recipe.');
         }
         return this.toRecipe(response.data);
+      })
+    );
+  }
+
+  getIngredientCosts(id: number): Observable<RecipeIngredientCost[]> {
+    return this.api.get<ApiEnvelope>(`recipes/${id}/ingredients/cost`).pipe(
+      map((response) => {
+        if (!response.success || !Array.isArray(response.data)) {
+          throw new Error(response.message || 'The API returned an invalid ingredient cost list.');
+        }
+        return response.data.map((ingredient) => this.toRecipeIngredientCost(ingredient));
       })
     );
   }
@@ -157,20 +181,58 @@ export class RecipeService {
 
     const id = this.toNumber(value['ingredientId']);
     const itemId = this.toNumber(value['itemId']);
-    const quantity = this.toNumber(value['qty']);
-    const unitId = this.toNumber(value['unitId']);
+    const quantity = this.toNumber(value['quantity'] ?? value['qty']);
+    const unitId = this.toNumber(value['unitId'] ?? value['inventoryUnitId']);
     const price = this.toNumber(value['price']);
+    const name = value['itemName'];
+    const unitName = value['unitName'] ?? value['unit_name'];
+    const stockQuantity = this.toNumber(value['stockQuantity']);
+    const inventoryUnitId = this.toNumber(value['inventoryUnitId']);
+
+    if (
+      id === null || itemId === null || quantity === null || unitId === null ||
+      price === null || typeof name !== 'string' ||
+      (unitName !== undefined && typeof unitName !== 'string')
+    ) {
+      throw new Error('The API returned a recipe ingredient with missing or invalid fields.');
+    }
+
+    return {
+      id,
+      itemId,
+      name,
+      quantity,
+      unitId,
+      unitName: typeof unitName === 'string' ? unitName : `Unit ${unitId}`,
+      stockQuantity,
+      inventoryUnitId,
+      price
+    };
+  }
+
+  private toRecipeIngredientCost(value: unknown): RecipeIngredientCost {
+    if (!this.isRecord(value)) {
+      throw new Error('The API returned an invalid recipe ingredient cost.');
+    }
+
+    const id = this.toNumber(value['ingredientId']);
+    const itemId = this.toNumber(value['itemId']);
+    const quantity = this.toNumber(value['quantity'] ?? value['qty']);
+    const unitId = this.toNumber(value['unitId']);
+    const costPerUnit = this.toNumber(value['costPerUnit']);
+    const totalCost = this.toNumber(value['totalCost']);
     const name = value['itemName'];
     const unitName = value['unitName'];
 
     if (
       id === null || itemId === null || quantity === null || unitId === null ||
-      price === null || typeof name !== 'string' || typeof unitName !== 'string'
+      costPerUnit === null || totalCost === null ||
+      typeof name !== 'string' || typeof unitName !== 'string'
     ) {
-      throw new Error('The API returned a recipe ingredient with missing or invalid fields.');
+      throw new Error('The API returned a recipe ingredient cost with missing or invalid fields.');
     }
 
-    return { id, itemId, name, quantity, unitId, unitName, price };
+    return { id, itemId, name, quantity, unitId, unitName, costPerUnit, totalCost };
   }
 
   private isRecord(value: unknown): value is Record<string, unknown> {

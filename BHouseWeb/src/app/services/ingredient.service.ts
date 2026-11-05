@@ -70,7 +70,7 @@ export class IngredientService {
     const unitId = this.toNumber(value['unitId']);
     const price = this.toNumber(value['price']);
     const name = value['itemName'];
-    const unitName = value['unit_name'];
+    const unitName = value['unitName'];
     const userId = value['userId'];
 
     if (
@@ -86,7 +86,7 @@ export class IngredientService {
       name,
       quantity,
       unitId,
-      unitName: typeof unitName === 'string' ? unitName : `Unit ${unitId}`,
+      unitName: unitName ?? `Unit ${unitId}`,
       price,
       userId
     };

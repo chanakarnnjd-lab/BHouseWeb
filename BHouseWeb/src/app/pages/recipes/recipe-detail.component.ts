@@ -2,7 +2,9 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { DecimalPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Recipe, RecipeService } from '../../services/recipe.service';
+import { forkJoin } from 'rxjs';
+import { Recipe, RecipeIngredientCost, RecipeService } from '../../services/recipe.service';
+import { calculateSuggestedSellingPrice } from '../../services/recipe-costing';
 
 @Component({
   selector: 'app-recipe-detail',
@@ -13,6 +15,7 @@ import { Recipe, RecipeService } from '../../services/recipe.service';
 })
 export class RecipeDetailComponent implements OnInit {
   recipe: Recipe | null = null;
+  ingredientCosts: RecipeIngredientCost[] = [];
   loading = true;
   deleting = false;
   missingRecipe = false;
@@ -32,9 +35,13 @@ export class RecipeDetailComponent implements OnInit {
       return;
     }
 
-    this.recipeService.getById(id).subscribe({
-      next: (recipe) => {
+    forkJoin({
+      recipe: this.recipeService.getById(id),
+      ingredientCosts: this.recipeService.getIngredientCosts(id)
+    }).subscribe({
+      next: ({ recipe, ingredientCosts }) => {
         this.recipe = recipe;
+        this.ingredientCosts = ingredientCosts;
         this.loading = false;
       },
       error: (error: unknown) => {
@@ -48,6 +55,21 @@ export class RecipeDetailComponent implements OnInit {
         }
       }
     });
+  }
+
+  get estimatedCost(): number | null {
+    if (!this.recipe || this.ingredientCosts.length === 0) return null;
+    return this.ingredientCosts.reduce((total, ingredient) => total + ingredient.totalCost, 0);
+  }
+
+  get estimatedCostPerServing(): number | null {
+    return this.estimatedCost === null || !this.recipe || this.recipe.servings < 1
+      ? null
+      : this.estimatedCost / this.recipe.servings;
+  }
+
+  get suggestedSellingPrice(): number | null {
+    return calculateSuggestedSellingPrice(this.estimatedCostPerServing, this.recipe?.margin ?? null);
   }
 
   deleteRecipe(): void {

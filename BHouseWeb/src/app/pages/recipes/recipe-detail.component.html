@@ -29,16 +29,19 @@
           <div><span>Servings</span><strong>{{ recipe.servings }}</strong></div>
           <div><span>Profit margin</span><strong>{{ recipe.margin }}%</strong></div>
           <div><span>Actual selling price</span><strong>{{ recipe.sellingPrice | number:'1.2-2' }}</strong></div>
+          <div><span>Estimated ingredient cost (whole recipe)</span><strong>{{ estimatedCost === null ? '—' : (estimatedCost | number:'1.2-2') }}</strong></div>
+          <div><span>Ingredient cost per serving</span><strong>{{ estimatedCostPerServing === null ? '—' : (estimatedCostPerServing | number:'1.2-2') }}</strong></div>
+          <div><span>Suggested selling price per serving</span><strong>{{ suggestedSellingPrice === null ? '—' : (suggestedSellingPrice | number:'1.2-2') }}</strong></div>
         </div>
 
         <section class="ingredients-section">
-          <h2>Ingredients <span>{{ recipe.ingredients.length }}</span></h2>
-          @if (recipe.ingredients.length) {
+          <h2>Ingredients <span>{{ ingredientCosts.length }}</span></h2>
+          @if (ingredientCosts.length) {
             <ul class="ingredient-list">
-              @for (ingredient of recipe.ingredients; track ingredient.id) {
+              @for (ingredient of ingredientCosts; track ingredient.id) {
                 <li>
-                  <span><strong>{{ ingredient.name }}</strong><small>Quantity: {{ ingredient.quantity | number:'1.0-2' }} {{ ingredient.unitName }}</small></span>
-                  <span class="ingredient-price">{{ ingredient.price | number:'1.2-2' }}</span>
+                  <span><strong>{{ ingredient.name }}</strong><small>Quantity used: {{ ingredient.quantity | number:'1.0-2' }} {{ ingredient.unitName }}</small></span>
+                  <span class="ingredient-price">{{ ingredient.totalCost | number:'1.2-2' }}</span>
                 </li>
               }
             </ul>

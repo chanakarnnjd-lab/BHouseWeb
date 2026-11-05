@@ -33,7 +33,7 @@
       <div class="field-row">
         <label class="field">
           <span>Profit margin (%) <b>*</b></span>
-          <input name="margin" type="number" [(ngModel)]="margin" min="0" step="1" required>
+          <input name="margin" type="number" [(ngModel)]="margin" min="0" max="99" step="1" required>
         </label>
         <label class="field">
           <span>Actual selling price <b>*</b></span>
@@ -110,7 +110,7 @@
             </select>
           </label>
           <label class="field">
-            <span>Quantity{{ getUnitName(row.unitId) ? ' (' + getUnitName(row.unitId) + ')' : '' }} <b>*</b></span>
+            <span>Quantity used{{ getUnitName(row.unitId) ? ' (' + getUnitName(row.unitId) + ')' : '' }} <b>*</b></span>
             <input [name]="'quantity-' + index" type="number" [(ngModel)]="row.quantity" min="1" step="1" required>
           </label>
           <button class="remove-ingredient" type="button" (click)="removeIngredient(index)" [attr.aria-label]="'Remove ingredient ' + (index + 1)">×</button>
@@ -120,6 +120,21 @@
       @if (ingredients.length === 0 && !errorMessage) {
         <p class="form-hint">Add ingredients first before including them in a recipe.</p>
       }
+
+      <section class="cost-summary" aria-live="polite">
+        <div><span>Estimated ingredient cost (whole recipe)</span><strong>{{ estimatedCost === null ? '—' : (estimatedCost | number:'1.2-2') }}</strong></div>
+        <div><span>Ingredient cost per serving</span><strong>{{ estimatedCostPerServing === null ? '—' : (estimatedCostPerServing | number:'1.2-2') }}</strong></div>
+        <div>
+          <span>Suggested selling price per serving ({{ margin ?? 0 }}% margin)</span>
+          <strong>{{ suggestedSellingPrice === null ? '—' : (suggestedSellingPrice | number:'1.2-2') }}</strong>
+        </div>
+        @if (estimatedCost === null && ingredientRows.length) {
+          <p>Cost estimate is unavailable. Check ingredient stock quantities and unit conversion factors.</p>
+        }
+        @if (margin !== null && margin >= 100) {
+          <p>Margin must be less than 100% to calculate a suggested selling price.</p>
+        }
+      </section>
 
       @if (errorMessage) { <div class="error-message" role="alert">{{ errorMessage }}</div> }
       <div class="form-actions">
