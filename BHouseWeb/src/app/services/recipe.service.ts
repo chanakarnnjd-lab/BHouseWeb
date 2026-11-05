@@ -8,6 +8,7 @@ export interface RecipeIngredient {
   name: string;
   quantity: number;
   unitId: number;
+  unitName: string;
   price: number;
 }
 
@@ -20,7 +21,7 @@ export interface Recipe {
   id: number;
   menu: string;
   margin: number;
-  additionalCostPerUnit: number;
+  sellingPrice: number;
   servings: number;
   userId: string;
   imageUrl: string | null;
@@ -35,7 +36,7 @@ export interface RecipeInput {
   serve: number;
   userId: string;
   picUrl: string | null;
-  ingredients: { itemId: number; qty: number }[];
+  ingredients: { itemId: number; unitId: number; qty: number }[];
   categoryIds: number[];
 }
 
@@ -106,7 +107,7 @@ export class RecipeService {
 
     const id = this.toNumber(value['recipesId']);
     const margin = this.toNumber(value['margin']);
-    const additionalCostPerUnit = this.toNumber(value['acc_unit']);
+    const sellingPrice = this.toNumber(value['acc_unit']);
     const servings = this.toNumber(value['serve']);
     const name = value['menu'];
     const userId = value['userId'];
@@ -115,7 +116,7 @@ export class RecipeService {
     const categories = value['categories'] ?? [];
 
     if (
-      id === null || margin === null || additionalCostPerUnit === null || servings === null ||
+      id === null || margin === null || sellingPrice === null || servings === null ||
       typeof name !== 'string' || typeof userId !== 'string' ||
       (imageUrl !== null && imageUrl !== undefined && typeof imageUrl !== 'string') ||
       !Array.isArray(ingredients) || !Array.isArray(categories)
@@ -127,7 +128,7 @@ export class RecipeService {
       id,
       menu: name,
       margin,
-      additionalCostPerUnit,
+      sellingPrice,
       servings,
       userId,
       imageUrl: typeof imageUrl === 'string' ? imageUrl : null,
@@ -160,15 +161,16 @@ export class RecipeService {
     const unitId = this.toNumber(value['unitId']);
     const price = this.toNumber(value['price']);
     const name = value['itemName'];
+    const unitName = value['unitName'];
 
     if (
       id === null || itemId === null || quantity === null || unitId === null ||
-      price === null || typeof name !== 'string'
+      price === null || typeof name !== 'string' || typeof unitName !== 'string'
     ) {
       throw new Error('The API returned a recipe ingredient with missing or invalid fields.');
     }
 
-    return { id, itemId, name, quantity, unitId, price };
+    return { id, itemId, name, quantity, unitId, unitName, price };
   }
 
   private isRecord(value: unknown): value is Record<string, unknown> {

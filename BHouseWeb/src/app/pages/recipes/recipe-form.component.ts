@@ -6,14 +6,17 @@ import { forkJoin } from 'rxjs';
 import { Ingredient, IngredientService } from '../../services/ingredient.service';
 import { Recipe, RecipeCategory, RecipeInput, RecipeService } from '../../services/recipe.service';
 import { RecipeCategoryService } from '../../services/recipe-category.service';
+import { Unit, UnitService } from '../../services/unit.service';
 
 interface RecipeIngredientRow {
   itemId: number | null;
+  unitId: number | null;
   quantity: number | null;
 }
 
 interface CompleteRecipeIngredientRow {
   itemId: number;
+  unitId: number;
   quantity: number;
 }
 
@@ -29,6 +32,7 @@ export class RecipeFormComponent implements OnInit {
   readonly isEditing = this.id !== null;
   readonly userId = 'admin';
   ingredients: Ingredient[] = [];
+  units: Unit[] = [];
   categories: RecipeCategory[] = [];
   selectedCategoryIds: number[] = [];
   ingredientRows: RecipeIngredientRow[] = [this.newIngredientRow()];
@@ -41,7 +45,7 @@ export class RecipeFormComponent implements OnInit {
   creatingCategory = false;
   menu = '';
   margin: number | null = null;
-  additionalCostPerUnit: number | null = null;
+  sellingPrice: number | null = null;
   servings: number | null = null;
   imageUrl = '';
 
@@ -50,7 +54,8 @@ export class RecipeFormComponent implements OnInit {
     private readonly router: Router,
     private readonly recipeService: RecipeService,
     private readonly ingredientService: IngredientService,
-    private readonly categoryService: RecipeCategoryService
+    private readonly categoryService: RecipeCategoryService,
+    private readonly unitService: UnitService
   ) {}
 
   ngOnInit(): void {
@@ -69,11 +74,13 @@ export class RecipeFormComponent implements OnInit {
     forkJoin({
       recipe: this.recipeService.getById(id),
       ingredients: this.ingredientService.getAll(),
-      categories: this.categoryService.getAll()
+      categories: this.categoryService.getAll(),
+      units: this.unitService.getAll()
     }).subscribe({
-      next: ({ recipe, ingredients, categories }) => {
+      next: ({ recipe, ingredients, categories, units }) => {
         this.ingredients = ingredients;
         this.categories = categories;
+        this.units = units;
         this.setFormValues(recipe);
         this.loading = false;
       },
@@ -92,8 +99,28 @@ export class RecipeFormComponent implements OnInit {
     this.ingredientRows.push(this.newIngredientRow());
   }
 
-  getIngredientUnitName(itemId: number | null): string {
-    return this.ingredients.find((ingredient) => ingredient.id === itemId)?.unitName ?? '';
+  getUnitName(unitId: number | null): string {
+    return this.units.find((unit) => unit.unitId === unitId)?.unitName ?? '';
+  }
+
+  getSelectableUnits(itemId: number | null): Unit[] {
+    const ingredient = this.ingredients.find((item) => item.id === itemId);
+    if (!ingredient) return [];
+
+    const ingredientRootId = this.rootUnitId(ingredient.unitId);
+    return this.units.filter((unit) =>
+      ingredientRootId === null
+        ? unit.unitId === ingredient.unitId
+        : this.rootUnitId(unit.unitId) === ingredientRootId
+    );
+  }
+
+  onIngredientSelected(row: RecipeIngredientRow, itemId: number | null): void {
+    row.itemId = itemId;
+    const selectableUnits = this.getSelectableUnits(itemId);
+    if (!selectableUnits.some((unit) => unit.unitId === row.unitId)) {
+      row.unitId = this.ingredients.find((ingredient) => ingredient.id === itemId)?.unitId ?? null;
+    }
   }
 
   toggleCategory(categoryId: number, event: Event): void {
@@ -136,9 +163,9 @@ export class RecipeFormComponent implements OnInit {
 
   save(): void {
     if (
-      this.menu.trim() === '' || this.margin === null || this.additionalCostPerUnit === null ||
+      this.menu.trim() === '' || this.margin === null || this.sellingPrice === null ||
       !Number.isInteger(this.margin) || this.margin < 0 ||
-      this.additionalCostPerUnit <= 0 ||
+      this.sellingPrice <= 0 ||
       this.servings === null || !Number.isInteger(this.servings) || this.servings < 1 ||
       !this.ingredientRows.every(this.isCompleteIngredientRow)
     ) {
@@ -149,12 +176,13 @@ export class RecipeFormComponent implements OnInit {
     const recipe: RecipeInput = {
       menu: this.menu.trim(),
       margin: this.margin,
-      acc_unit: this.additionalCostPerUnit,
+      acc_unit: this.sellingPrice,
       serve: this.servings,
       userId: this.userId,
       picUrl: this.imageUrl.trim() || null,
       ingredients: ingredientRows.map((row) => ({
         itemId: row.itemId,
+        unitId: row.unitId,
         qty: row.quantity
       })),
       categoryIds: [...this.selectedCategoryIds]
@@ -178,11 +206,13 @@ export class RecipeFormComponent implements OnInit {
   private loadNewRecipeData(): void {
     forkJoin({
       ingredients: this.ingredientService.getAll(),
-      categories: this.categoryService.getAll()
+      categories: this.categoryService.getAll(),
+      units: this.unitService.getAll()
     }).subscribe({
-      next: ({ ingredients, categories }) => {
+      next: ({ ingredients, categories, units }) => {
         this.ingredients = ingredients;
         this.categories = categories;
+        this.units = units;
         this.loading = false;
       },
       error: (error: unknown) => {
@@ -197,21 +227,39 @@ export class RecipeFormComponent implements OnInit {
   private setFormValues(recipe: Recipe): void {
     this.menu = recipe.menu;
     this.margin = recipe.margin;
-    this.additionalCostPerUnit = recipe.additionalCostPerUnit;
+    this.sellingPrice = recipe.sellingPrice;
     this.servings = recipe.servings;
     this.imageUrl = recipe.imageUrl ?? '';
     this.selectedCategoryIds = recipe.categories.map((category) => category.id);
     this.ingredientRows = recipe.ingredients.length
-      ? recipe.ingredients.map((ingredient) => ({ itemId: ingredient.itemId, quantity: ingredient.quantity }))
+      ? recipe.ingredients.map((ingredient) => ({
+          itemId: ingredient.itemId,
+          unitId: ingredient.unitId,
+          quantity: ingredient.quantity
+        }))
       : [this.newIngredientRow()];
   }
 
+  private rootUnitId(unitId: number): number | null {
+    let currentId = unitId;
+    const visited = new Set<number>();
+    while (!visited.has(currentId)) {
+      visited.add(currentId);
+      const current = this.units.find((unit) => unit.unitId === currentId);
+      if (!current) return null;
+      if (current.parentId === null) return currentId;
+      currentId = current.parentId;
+    }
+    return null;
+  }
+
   private newIngredientRow(): RecipeIngredientRow {
-    return { itemId: null, quantity: null };
+    return { itemId: null, unitId: null, quantity: null };
   }
 
   private isCompleteIngredientRow(row: RecipeIngredientRow): row is CompleteRecipeIngredientRow {
     return row.itemId !== null && Number.isInteger(row.itemId) &&
+      row.unitId !== null && Number.isInteger(row.unitId) &&
       row.quantity !== null && Number.isInteger(row.quantity) && row.quantity >= 1;
   }
 

@@ -18,7 +18,7 @@
     </div>
 
     <form class="form-card" (ngSubmit)="save()" #recipeForm="ngForm">
-      <div class="form-section-title"><span class="form-icon">🥘</span><div><strong>Recipe details</strong><small>Menu and pricing information.</small></div></div>
+      <div class="form-section-title"><span class="form-icon">🥘</span><div><strong>Recipe details</strong><small>Menu and selling price information.</small></div></div>
 
       <label class="field">
         <span>Menu name <b>*</b></span>
@@ -36,8 +36,8 @@
           <input name="margin" type="number" [(ngModel)]="margin" min="0" step="1" required>
         </label>
         <label class="field">
-          <span>Additional cost per unit <b>*</b></span>
-          <input name="additionalCostPerUnit" type="number" [(ngModel)]="additionalCostPerUnit" min="0.01" step="any" required>
+          <span>Actual selling price <b>*</b></span>
+          <input name="sellingPrice" type="number" [(ngModel)]="sellingPrice" min="0.01" step="any" required>
         </label>
       </div>
 
@@ -89,7 +89,11 @@
         <div class="ingredient-row">
           <label class="field">
             <span>Ingredient <b>*</b></span>
-            <select [name]="'ingredient-' + index" [(ngModel)]="row.itemId" required>
+            <select
+              [name]="'ingredient-' + index"
+              [ngModel]="row.itemId"
+              (ngModelChange)="onIngredientSelected(row, $event)"
+              required>
               <option [ngValue]="null" disabled>Select an ingredient</option>
               @for (ingredient of ingredients; track ingredient.id) {
                 <option [ngValue]="ingredient.id">{{ ingredient.name }} ({{ ingredient.unitName }})</option>
@@ -97,7 +101,16 @@
             </select>
           </label>
           <label class="field">
-            <span>Quantity{{ getIngredientUnitName(row.itemId) ? ' (' + getIngredientUnitName(row.itemId) + ')' : '' }} <b>*</b></span>
+            <span>Unit <b>*</b></span>
+            <select [name]="'unit-' + index" [(ngModel)]="row.unitId" required [disabled]="!row.itemId">
+              <option [ngValue]="null" disabled>Select a unit</option>
+              @for (unit of getSelectableUnits(row.itemId); track unit.unitId) {
+                <option [ngValue]="unit.unitId">{{ unit.unitName }}</option>
+              }
+            </select>
+          </label>
+          <label class="field">
+            <span>Quantity{{ getUnitName(row.unitId) ? ' (' + getUnitName(row.unitId) + ')' : '' }} <b>*</b></span>
             <input [name]="'quantity-' + index" type="number" [(ngModel)]="row.quantity" min="1" step="1" required>
           </label>
           <button class="remove-ingredient" type="button" (click)="removeIngredient(index)" [attr.aria-label]="'Remove ingredient ' + (index + 1)">×</button>

@@ -30,11 +30,42 @@
           <span>Quantity <b>*</b></span>
           <input name="quantity" type="number" [(ngModel)]="quantity" placeholder="e.g. 10" min="0" step="any" required>
         </label>
-        <label class="field">
-          <span>Unit ID <b>*</b></span>
-          <input name="unitId" type="number" [(ngModel)]="unitId" placeholder="Enter unit ID" min="1" step="1" required>
-          <small>Use a unit ID configured in the API.</small>
-        </label>
+        <div class="field">
+          <label for="unitSearch">Unit <b>*</b></label>
+          <div class="unit-picker">
+            <input
+              id="unitSearch"
+              name="unitSearch"
+              type="search"
+              [(ngModel)]="unitSearch"
+              (ngModelChange)="searchUnits($event)"
+              (focus)="unitOptionsOpen = true"
+              (blur)="unitOptionsOpen = false"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-controls="unit-options"
+              [attr.aria-expanded]="unitOptionsOpen"
+              placeholder="Search or select a unit"
+              autocomplete="off"
+              required>
+            @if (unitOptionsOpen) {
+              <div id="unit-options" class="unit-options" role="listbox" aria-label="Units">
+                @for (unit of filteredUnits; track unit.unitId) {
+                  <button
+                    type="button"
+                    role="option"
+                    [attr.aria-selected]="unit.unitId === unitId"
+                    (mousedown)="$event.preventDefault()"
+                    (click)="selectUnit(unit)">
+                    {{ unit.unitName }}
+                  </button>
+                } @empty {
+                  <span class="no-unit-options">No matching units</span>
+                }
+              </div>
+            }
+          </div>
+        </div>
       </div>
 
       <label class="field">
@@ -45,7 +76,7 @@
       @if (errorMessage) { <div class="error-message" role="alert">{{ errorMessage }}</div> }
       <div class="form-actions">
         <a class="cancel-button" routerLink="/ingredients">Cancel</a>
-        <button class="primary-button" type="submit" [disabled]="ingredientForm.invalid || saving">{{ saving ? 'Saving...' : isEditing ? 'Save changes' : 'Add ingredient' }}</button>
+        <button class="primary-button" type="submit" [disabled]="ingredientForm.invalid || unitId === null || saving">{{ saving ? 'Saving...' : isEditing ? 'Save changes' : 'Add ingredient' }}</button>
       </div>
     </form>
   }

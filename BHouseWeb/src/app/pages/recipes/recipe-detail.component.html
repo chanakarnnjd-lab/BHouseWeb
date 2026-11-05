@@ -28,7 +28,7 @@
         <div class="recipe-stats">
           <div><span>Servings</span><strong>{{ recipe.servings }}</strong></div>
           <div><span>Profit margin</span><strong>{{ recipe.margin }}%</strong></div>
-          <div><span>Additional cost / unit</span><strong>{{ recipe.additionalCostPerUnit | number:'1.2-2' }}</strong></div>
+          <div><span>Actual selling price</span><strong>{{ recipe.sellingPrice | number:'1.2-2' }}</strong></div>
         </div>
 
         <section class="ingredients-section">
@@ -37,7 +37,7 @@
             <ul class="ingredient-list">
               @for (ingredient of recipe.ingredients; track ingredient.id) {
                 <li>
-                  <span><strong>{{ ingredient.name }}</strong><small>Quantity: {{ ingredient.quantity | number:'1.0-2' }}</small></span>
+                  <span><strong>{{ ingredient.name }}</strong><small>Quantity: {{ ingredient.quantity | number:'1.0-2' }} {{ ingredient.unitName }}</small></span>
                   <span class="ingredient-price">{{ ingredient.price | number:'1.2-2' }}</span>
                 </li>
               }
