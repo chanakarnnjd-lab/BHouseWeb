@@ -1,0 +1,82 @@
+<section class="units-page">
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">ADMINISTRATION</div>
+      <h1>Units <span>✳</span></h1>
+      <p class="page-subtitle">Manage measurement units and their parent-child conversions.</p>
+    </div>
+    @if (!editorOpen) {
+      <button class="add-button" type="button" (click)="startCreate()">＋ Add unit</button>
+    }
+  </div>
+
+  @if (editorOpen) {
+    <form class="unit-editor" (ngSubmit)="save()" #unitForm="ngForm">
+      <h2>{{ editingId === null ? 'Add a unit' : 'Edit unit' }}</h2>
+      <label class="field">
+        <span>Unit name <b>*</b></span>
+        <input name="unitName" [(ngModel)]="unitName" placeholder="e.g. g or kg" maxlength="100" required>
+      </label>
+      <div class="field-row">
+        <label class="field">
+          <span>Parent unit</span>
+          <select name="parentId" [(ngModel)]="parentId">
+            <option [ngValue]="null">None — base unit</option>
+            @for (unit of parentOptions; track unit.unitId) {
+              <option [ngValue]="unit.unitId">{{ unit.unitName }}</option>
+            }
+          </select>
+        </label>
+        <label class="field">
+          <span>Conversion factor (N)</span>
+          <input name="conversionFactor" type="number" [(ngModel)]="conversionFactor" min="1" step="1" placeholder="e.g. 1000">
+        </label>
+      </div>
+      <p class="form-hint">For example, set kg as a child of g with N = 1000 to store the conversion relationship.</p>
+      @if (editorErrorMessage) {
+        <div class="error-message" role="alert">{{ editorErrorMessage }}</div>
+      }
+      <div class="form-actions">
+        <button class="cancel-button" type="button" (click)="cancelEdit()">Cancel</button>
+        <button class="primary-button" type="submit" [disabled]="unitForm.invalid || saving">
+          {{ saving ? 'Saving...' : editingId === null ? 'Add unit' : 'Save changes' }}
+        </button>
+      </div>
+    </form>
+  }
+
+  @if (errorMessage) {
+    <div class="error-message page-error" role="alert">{{ errorMessage }}</div>
+  }
+
+  <section class="unit-list" aria-label="Unit hierarchy">
+    <div class="list-heading">
+      <div><h2>Unit hierarchy</h2><p>{{ units.length }} units in the database</p></div>
+    </div>
+    @if (loading) {
+      <div class="empty-state">Loading units...</div>
+    } @else if (units.length === 0) {
+      <div class="empty-state">No units yet. Add a base unit to get started.</div>
+    } @else {
+      <div class="unit-table">
+        <div class="table-header"><span>UNIT</span><span>PARENT</span><span>FACTOR (N)</span><span></span></div>
+        @for (row of treeRows; track row.unit.unitId) {
+          <article class="unit-row">
+            <div class="unit-name" [style.padding-left.px]="row.level * 22">
+              <span class="tree-marker">{{ row.level ? '↳' : '●' }}</span>
+              <strong>{{ row.unit.unitName }}</strong>
+            </div>
+            <span class="parent-name">{{ parentName(row.unit.parentId) }}</span>
+            <span class="factor">{{ row.unit.N ?? '—' }}</span>
+            <div class="row-actions">
+              <button type="button" (click)="startEdit(row.unit)">Edit</button>
+              <button type="button" class="delete-button" (click)="delete(row.unit)" [disabled]="deletingId === row.unit.unitId">
+                {{ deletingId === row.unit.unitId ? 'Deleting...' : 'Delete' }}
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    }
+  </section>
+</section>

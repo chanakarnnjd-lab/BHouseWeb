@@ -4,6 +4,7 @@ import { ApiService } from './api.service';
 import {
   AUTH_TOKEN_STORAGE_KEY,
   AUTH_USER_EMAIL_STORAGE_KEY,
+  AUTH_USER_ID_STORAGE_KEY,
   AUTH_USER_NAME_STORAGE_KEY
 } from './auth-token';
 
@@ -17,8 +18,10 @@ export interface RegisterCredentials extends LoginCredentials {
 }
 
 export interface AuthUser {
+  userId: string | null;
   name: string | null;
   email: string | null;
+  isAdmin: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -52,8 +55,16 @@ export class AuthService {
         const savedName = savedEmail?.toLowerCase() === credentials.email.trim().toLowerCase()
           ? sessionStorage.getItem(AUTH_USER_NAME_STORAGE_KEY)
           : null;
+        const userId = user.userId ?? this.firstIdentifier(
+          claims?.['userId'],
+          claims?.['user_id'],
+          claims?.['id'],
+          claims?.['sub']
+        );
         sessionStorage.setItem(AUTH_TOKEN_STORAGE_KEY, token);
         sessionStorage.setItem(AUTH_USER_EMAIL_STORAGE_KEY, user.email ?? credentials.email.trim());
+        if (userId) sessionStorage.setItem(AUTH_USER_ID_STORAGE_KEY, userId);
+        else sessionStorage.removeItem(AUTH_USER_ID_STORAGE_KEY);
         const name = user.name ?? this.firstString(claims?.['name'], claims?.['fullName'], claims?.['username']) ?? savedName;
         if (name) sessionStorage.setItem(AUTH_USER_NAME_STORAGE_KEY, name);
         else sessionStorage.removeItem(AUTH_USER_NAME_STORAGE_KEY);
@@ -74,6 +85,7 @@ export class AuthService {
       tap(() => {
         sessionStorage.removeItem(AUTH_TOKEN_STORAGE_KEY);
         sessionStorage.removeItem(AUTH_USER_EMAIL_STORAGE_KEY);
+        sessionStorage.removeItem(AUTH_USER_ID_STORAGE_KEY);
         sessionStorage.removeItem(AUTH_USER_NAME_STORAGE_KEY);
       })
     );
@@ -93,6 +105,13 @@ export class AuthService {
     const claims = this.readTokenClaims(token);
     const tokenEmail = this.firstString(claims?.['email'], claims?.['preferred_username']);
     const email = tokenEmail ?? sessionStorage.getItem(AUTH_USER_EMAIL_STORAGE_KEY);
+    const userId = this.firstIdentifier(
+      claims?.['userId'],
+      claims?.['user_id'],
+      claims?.['id'],
+      claims?.['sub'],
+      sessionStorage.getItem(AUTH_USER_ID_STORAGE_KEY)
+    );
     const name = this.firstString(
       claims?.['name'],
       claims?.['fullName'],
@@ -101,7 +120,11 @@ export class AuthService {
       email?.split('@')[0]
     );
 
-    return { name, email };
+    return { userId, name, email, isAdmin: this.isAdminFlag(claims?.['isAdmin']) };
+  }
+
+  getCurrentUserId(): string | null {
+    return this.getCurrentUser()?.userId ?? null;
   }
 
   private readToken(response: unknown): string {
@@ -130,16 +153,18 @@ export class AuthService {
   }
 
   private readUserFromResponse(response: unknown): AuthUser {
-    if (!this.isRecord(response)) return { name: null, email: null };
+    if (!this.isRecord(response)) return { userId: null, name: null, email: null, isAdmin: false };
     const data = this.isRecord(response['data']) ? response['data'] : null;
     const user = data && this.isRecord(data['user'])
       ? data['user']
       : this.isRecord(response['user']) ? response['user'] : data;
-    if (!user) return { name: null, email: null };
+    if (!user) return { userId: null, name: null, email: null, isAdmin: false };
 
     return {
+      userId: this.firstIdentifier(user['userId'], user['user_id'], user['id']),
       name: this.firstString(user['name'], user['fullName'], user['username'], user['userName']),
-      email: this.firstString(user['email'])
+      email: this.firstString(user['email']),
+      isAdmin: this.isAdminFlag(user['isAdmin'])
     };
   }
 
@@ -163,5 +188,17 @@ export class AuthService {
       if (typeof value === 'string' && value.trim() !== '') return value;
     }
     return null;
+  }
+
+  private firstIdentifier(...values: unknown[]): string | null {
+    for (const value of values) {
+      if (typeof value === 'string' && value.trim() !== '') return value;
+      if (typeof value === 'number' && Number.isFinite(value)) return String(value);
+    }
+    return null;
+  }
+
+  private isAdminFlag(value: unknown): boolean {
+    return value === true || value === 1;
   }
 }

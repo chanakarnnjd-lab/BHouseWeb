@@ -14,9 +14,9 @@
       <div class="welcome">YOUR RECIPE WORKSPACE <span>✦</span></div>
       <h2>Let’s get you in.</h2>
       <p class="intro">Sign in to manage recipes and plan your costs.</p>
-      <form (ngSubmit)="signIn()" #loginForm="ngForm">
+      <form (ngSubmit)="signIn()" #loginForm="ngForm" autocomplete="on">
         <label for="email">Email address</label>
-        <input id="email" name="email" type="email" [(ngModel)]="email" placeholder="you@example.com" autocomplete="email" required>
+        <input id="email" name="email" type="email" [(ngModel)]="email" placeholder="you@example.com" autocomplete="username" required>
         <div class="password-label"><label for="password">Password</label><a href="mailto:hello@bhouse.app?subject=Reset%20password">Forgot password?</a></div>
         <div class="password-input">
           <input id="password" name="password" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" placeholder="Enter your password" autocomplete="current-password" required>

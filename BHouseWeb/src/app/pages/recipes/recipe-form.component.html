@@ -46,6 +46,40 @@
         <input name="servings" type="number" [(ngModel)]="servings" min="1" step="1" required>
       </label>
 
+      <div class="form-section-title category-section-title">
+        <span class="form-icon">🏷️</span>
+        <div><strong>Recipe categories</strong><small>Select one or more categories, or create a new one.</small></div>
+      </div>
+      @if (categories.length) {
+        <div class="category-options">
+          @for (category of categories; track category.id) {
+            <label class="category-option">
+              <input
+                type="checkbox"
+                [checked]="selectedCategoryIds.includes(category.id)"
+                (change)="toggleCategory(category.id, $event)">
+              <span>{{ category.name }}</span>
+            </label>
+          }
+        </div>
+      } @else {
+        <p class="form-hint">No categories yet. Create one to organize this recipe.</p>
+      }
+      <div class="new-category-row">
+        <input
+          name="newCategory"
+          [(ngModel)]="categoryName"
+          placeholder="New category name"
+          maxlength="100"
+          aria-label="New category name">
+        <button class="add-ingredient" type="button" (click)="createCategory()" [disabled]="!categoryName.trim() || creatingCategory">
+          {{ creatingCategory ? 'Creating...' : 'Create category' }}
+        </button>
+      </div>
+      @if (categoryErrorMessage) {
+        <div class="error-message" role="alert">{{ categoryErrorMessage }}</div>
+      }
+
       <div class="form-section-title ingredient-section-title">
         <span class="form-icon">🥬</span>
         <div><strong>Recipe ingredients</strong><small>Select ingredients and enter the quantity used.</small></div>
@@ -63,7 +97,7 @@
             </select>
           </label>
           <label class="field">
-            <span>Quantity <b>*</b></span>
+            <span>Quantity{{ getIngredientUnitName(row.itemId) ? ' (' + getIngredientUnitName(row.itemId) + ')' : '' }} <b>*</b></span>
             <input [name]="'quantity-' + index" type="number" [(ngModel)]="row.quantity" min="1" step="1" required>
           </label>
           <button class="remove-ingredient" type="button" (click)="removeIngredient(index)" [attr.aria-label]="'Remove ingredient ' + (index + 1)">×</button>

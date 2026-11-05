@@ -8,6 +8,8 @@ import { IngredientFormComponent } from './pages/ingredients/ingredient-form.com
 import { RecipeFormComponent } from './pages/recipes/recipe-form.component';
 import { RecipeDetailComponent } from './pages/recipes/recipe-detail.component';
 import { authGuard } from './services/auth.guard';
+import { adminGuard } from './services/admin.guard';
+import { UnitsComponent } from './pages/units/units.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -25,6 +27,7 @@ export const routes: Routes = [
       { path: 'ingredients/new', component: IngredientFormComponent },
       { path: 'ingredients/:id/edit', component: IngredientFormComponent },
       { path: 'ingredients', component: IngredientsComponent },
+      { path: 'units', component: UnitsComponent, canActivate: [adminGuard] },
       { path: 'items', redirectTo: 'ingredients', pathMatch: 'full' },
       { path: '', redirectTo: 'recipes', pathMatch: 'full' }
     ]

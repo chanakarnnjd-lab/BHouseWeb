@@ -4,7 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { Ingredient, IngredientService } from '../../services/ingredient.service';
-import { Recipe, RecipeInput, RecipeService } from '../../services/recipe.service';
+import { Recipe, RecipeCategory, RecipeInput, RecipeService } from '../../services/recipe.service';
+import { RecipeCategoryService } from '../../services/recipe-category.service';
 
 interface RecipeIngredientRow {
   itemId: number | null;
@@ -28,11 +29,16 @@ export class RecipeFormComponent implements OnInit {
   readonly isEditing = this.id !== null;
   readonly userId = 'admin';
   ingredients: Ingredient[] = [];
+  categories: RecipeCategory[] = [];
+  selectedCategoryIds: number[] = [];
   ingredientRows: RecipeIngredientRow[] = [this.newIngredientRow()];
   missingRecipe = false;
   loading = true;
   saving = false;
   errorMessage = '';
+  categoryErrorMessage = '';
+  categoryName = '';
+  creatingCategory = false;
   menu = '';
   margin: number | null = null;
   additionalCostPerUnit: number | null = null;
@@ -43,12 +49,13 @@ export class RecipeFormComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly router: Router,
     private readonly recipeService: RecipeService,
-    private readonly ingredientService: IngredientService
+    private readonly ingredientService: IngredientService,
+    private readonly categoryService: RecipeCategoryService
   ) {}
 
   ngOnInit(): void {
     if (!this.id) {
-      this.loadIngredients();
+      this.loadNewRecipeData();
       return;
     }
 
@@ -61,10 +68,12 @@ export class RecipeFormComponent implements OnInit {
     this.loading = true;
     forkJoin({
       recipe: this.recipeService.getById(id),
-      ingredients: this.ingredientService.getAll()
+      ingredients: this.ingredientService.getAll(),
+      categories: this.categoryService.getAll()
     }).subscribe({
-      next: ({ recipe, ingredients }) => {
+      next: ({ recipe, ingredients, categories }) => {
         this.ingredients = ingredients;
+        this.categories = categories;
         this.setFormValues(recipe);
         this.loading = false;
       },
@@ -81,6 +90,40 @@ export class RecipeFormComponent implements OnInit {
 
   addIngredient(): void {
     this.ingredientRows.push(this.newIngredientRow());
+  }
+
+  getIngredientUnitName(itemId: number | null): string {
+    return this.ingredients.find((ingredient) => ingredient.id === itemId)?.unitName ?? '';
+  }
+
+  toggleCategory(categoryId: number, event: Event): void {
+    if (!(event.target instanceof HTMLInputElement)) return;
+    const selected = event.target.checked;
+    this.selectedCategoryIds = selected
+      ? [...this.selectedCategoryIds, categoryId]
+      : this.selectedCategoryIds.filter((id) => id !== categoryId);
+  }
+
+  createCategory(): void {
+    const name = this.categoryName.trim();
+    if (!name || this.creatingCategory) return;
+
+    this.creatingCategory = true;
+    this.categoryErrorMessage = '';
+    this.categoryService.create(name).subscribe({
+      next: (category) => {
+        this.categories = [...this.categories, category].sort((a, b) => a.name.localeCompare(b.name));
+        this.selectedCategoryIds = [...this.selectedCategoryIds, category.id];
+        this.categoryName = '';
+        this.creatingCategory = false;
+      },
+      error: (error: unknown) => {
+        this.creatingCategory = false;
+        this.categoryErrorMessage = error instanceof HttpErrorResponse
+          ? `Could not create category (HTTP ${error.status}). Check the API server and try again.`
+          : error instanceof Error ? error.message : 'Could not create category.';
+      }
+    });
   }
 
   removeIngredient(index: number): void {
@@ -113,7 +156,8 @@ export class RecipeFormComponent implements OnInit {
       ingredients: ingredientRows.map((row) => ({
         itemId: row.itemId,
         qty: row.quantity
-      }))
+      })),
+      categoryIds: [...this.selectedCategoryIds]
     };
 
     this.saving = true;
@@ -131,17 +175,21 @@ export class RecipeFormComponent implements OnInit {
     });
   }
 
-  private loadIngredients(): void {
-    this.ingredientService.getAll().subscribe({
-      next: (ingredients) => {
+  private loadNewRecipeData(): void {
+    forkJoin({
+      ingredients: this.ingredientService.getAll(),
+      categories: this.categoryService.getAll()
+    }).subscribe({
+      next: ({ ingredients, categories }) => {
         this.ingredients = ingredients;
+        this.categories = categories;
         this.loading = false;
       },
       error: (error: unknown) => {
         this.loading = false;
         this.errorMessage = error instanceof HttpErrorResponse
-          ? `Could not load ingredients (HTTP ${error.status}). Check the API server and try again.`
-          : error instanceof Error ? error.message : 'Could not load ingredients.';
+          ? `Could not load form data (HTTP ${error.status}). Check the API server and try again.`
+          : error instanceof Error ? error.message : 'Could not load form data.';
       }
     });
   }
@@ -152,6 +200,7 @@ export class RecipeFormComponent implements OnInit {
     this.additionalCostPerUnit = recipe.additionalCostPerUnit;
     this.servings = recipe.servings;
     this.imageUrl = recipe.imageUrl ?? '';
+    this.selectedCategoryIds = recipe.categories.map((category) => category.id);
     this.ingredientRows = recipe.ingredients.length
       ? recipe.ingredients.map((ingredient) => ({ itemId: ingredient.itemId, quantity: ingredient.quantity }))
       : [this.newIngredientRow()];

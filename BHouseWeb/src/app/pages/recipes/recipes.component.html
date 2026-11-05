@@ -9,6 +9,16 @@
     <span class="feature-spark">✦</span>
   </div>
   <div class="list-heading"><div><h2>Your recipes</h2><p>Keep recipes and pricing notes organized in one place.</p></div><div class="list-actions"><div class="page-search"><span>⌕</span><input aria-label="Search recipes" type="search" [(ngModel)]="searchTerm" placeholder="Find a recipe..."></div><a class="add-recipe-button" routerLink="/recipes/new"><span>＋</span> Add recipe</a></div></div>
+  <div class="recipe-filters">
+    <label for="category-filter">Category</label>
+    <select id="category-filter" name="category" [(ngModel)]="selectedCategory">
+      <option value="all">All categories</option>
+      <option value="uncategorized">Uncategorized</option>
+      @for (category of categories; track category.id) {
+        <option [value]="category.id">{{ category.name }}</option>
+      }
+    </select>
+  </div>
   <div class="recipe-grid">
     @if (loading) {
       <div class="collection-state">Loading recipes...</div>
@@ -26,6 +36,13 @@
         </div>
         <div class="recipe-info">
           <a class="recipe-title" [routerLink]="['/recipes', recipe.id]">{{ recipe.menu }}</a>
+          <div class="recipe-categories" aria-label="Recipe categories">
+            @for (category of recipe.categories; track category.id) {
+              <span>{{ category.name }}</span>
+            } @empty {
+              <span class="uncategorized">Uncategorized</span>
+            }
+          </div>
           <div class="recipe-meta"><span>{{ recipe.servings }} servings</span><span>{{ recipe.margin }}% margin</span></div>
           <div class="recipe-cost">Additional cost / unit <strong>{{ recipe.additionalCostPerUnit | number:'1.2-2' }}</strong></div>
           <a class="edit-recipe-link" [routerLink]="['/recipes', recipe.id, 'edit']" [attr.aria-label]="'Edit ' + recipe.menu" title="Edit recipe">

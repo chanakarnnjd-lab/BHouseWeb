@@ -11,6 +11,11 @@ export interface RecipeIngredient {
   price: number;
 }
 
+export interface RecipeCategory {
+  id: number;
+  name: string;
+}
+
 export interface Recipe {
   id: number;
   menu: string;
@@ -20,6 +25,7 @@ export interface Recipe {
   userId: string;
   imageUrl: string | null;
   ingredients: RecipeIngredient[];
+  categories: RecipeCategory[];
 }
 
 export interface RecipeInput {
@@ -30,6 +36,7 @@ export interface RecipeInput {
   userId: string;
   picUrl: string | null;
   ingredients: { itemId: number; qty: number }[];
+  categoryIds: number[];
 }
 
 interface ApiEnvelope {
@@ -105,12 +112,13 @@ export class RecipeService {
     const userId = value['userId'];
     const imageUrl = value['picUrl'];
     const ingredients = value['ingredients'];
+    const categories = value['categories'] ?? [];
 
     if (
       id === null || margin === null || additionalCostPerUnit === null || servings === null ||
       typeof name !== 'string' || typeof userId !== 'string' ||
       (imageUrl !== null && imageUrl !== undefined && typeof imageUrl !== 'string') ||
-      !Array.isArray(ingredients)
+      !Array.isArray(ingredients) || !Array.isArray(categories)
     ) {
       throw new Error('The API returned a recipe with missing or invalid fields.');
     }
@@ -123,8 +131,22 @@ export class RecipeService {
       servings,
       userId,
       imageUrl: typeof imageUrl === 'string' ? imageUrl : null,
-      ingredients: ingredients.map((ingredient) => this.toRecipeIngredient(ingredient))
+      ingredients: ingredients.map((ingredient) => this.toRecipeIngredient(ingredient)),
+      categories: categories.map((category) => this.toRecipeCategory(category))
     };
+  }
+
+  private toRecipeCategory(value: unknown): RecipeCategory {
+    if (!this.isRecord(value)) {
+      throw new Error('The API returned an invalid recipe category.');
+    }
+
+    const id = this.toNumber(value['categoryId']);
+    const name = value['categoryName'];
+    if (id === null || typeof name !== 'string') {
+      throw new Error('The API returned a recipe category with missing or invalid fields.');
+    }
+    return { id, name };
   }
 
   private toRecipeIngredient(value: unknown): RecipeIngredient {

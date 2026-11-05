@@ -14,6 +14,7 @@ import { Recipe, RecipeService } from '../../services/recipe.service';
 })
 export class RecipesComponent implements OnInit {
   searchTerm = '';
+  selectedCategory = 'all';
   recipes: Recipe[] = [];
   loading = true;
   errorMessage = '';
@@ -35,10 +36,27 @@ export class RecipesComponent implements OnInit {
     });
   }
 
+  get categories(): Recipe['categories'] {
+    const categories = new Map<number, Recipe['categories'][number]>();
+    for (const recipe of this.recipes) {
+      for (const category of recipe.categories) {
+        categories.set(category.id, category);
+      }
+    }
+    return [...categories.values()].sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   get filteredRecipes(): Recipe[] {
     const query = this.searchTerm.trim().toLowerCase();
-    return this.recipes.filter((recipe) =>
-      `${recipe.menu} ${recipe.ingredients.map((ingredient) => ingredient.name).join(' ')}`.toLowerCase().includes(query)
-    );
+    return this.recipes.filter((recipe) => {
+      const matchesSearch = `${recipe.menu} ${recipe.ingredients.map((ingredient) => ingredient.name).join(' ')} ${recipe.categories.map((category) => category.name).join(' ')}`
+        .toLowerCase()
+        .includes(query);
+      const matchesCategory = this.selectedCategory === 'all' ||
+        (this.selectedCategory === 'uncategorized'
+          ? recipe.categories.length === 0
+          : recipe.categories.some((category) => String(category.id) === this.selectedCategory));
+      return matchesSearch && matchesCategory;
+    });
   }
 }

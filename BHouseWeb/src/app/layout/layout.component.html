@@ -18,6 +18,11 @@
       <a routerLink="/ingredients" routerLinkActive="active">
         <span class="nav-icon">▤</span><span>Ingredients</span>
       </a>
+      @if (user?.isAdmin) {
+        <a routerLink="/units" routerLinkActive="active">
+          <span class="nav-icon">⇄</span><span>Units</span>
+        </a>
+      }
     </nav>
 
     <div class="sidebar-bottom">

@@ -37,16 +37,10 @@
         </label>
       </div>
 
-      <div class="field-row">
-        <label class="field">
-          <span>Price <b>*</b></span>
-          <input name="price" type="number" [(ngModel)]="price" placeholder="e.g. 25.00" min="0" step="any" required>
-        </label>
-        <label class="field">
-          <span>User ID <b>*</b></span>
-          <input name="userId" [(ngModel)]="userId" placeholder="e.g. admin" required maxlength="80">
-        </label>
-      </div>
+      <label class="field">
+        <span>Price <b>*</b></span>
+        <input name="price" type="number" [(ngModel)]="price" placeholder="e.g. 25.00" min="0" step="any" required>
+      </label>
 
       @if (errorMessage) { <div class="error-message" role="alert">{{ errorMessage }}</div> }
       <div class="form-actions">

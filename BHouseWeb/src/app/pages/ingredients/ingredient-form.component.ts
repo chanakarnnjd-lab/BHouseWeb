@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { Ingredient, IngredientInput, IngredientService } from '../../services/ingredient.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-ingredient-form',
@@ -22,12 +23,12 @@ export class IngredientFormComponent implements OnInit {
   quantity: number | null = null;
   unitId: number | null = null;
   price: number | null = null;
-  userId = 'admin';
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly router: Router,
-    private readonly ingredientService: IngredientService
+    private readonly ingredientService: IngredientService,
+    private readonly authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -60,12 +61,18 @@ export class IngredientFormComponent implements OnInit {
   save(): void {
     if (this.name.trim() === '' || this.quantity === null || this.unitId === null || this.price === null) return;
 
+    const userId = this.authService.getCurrentUserId();
+    if (!userId) {
+      this.errorMessage = 'Could not identify the signed-in user. Please sign in again.';
+      return;
+    }
+
     const ingredient: IngredientInput = {
       name: this.name.trim(),
       qty: this.quantity,
       unitId: this.unitId,
       price: this.price,
-      userId: this.userId.trim()
+      userId
     };
 
     this.saving = true;
@@ -90,6 +97,5 @@ export class IngredientFormComponent implements OnInit {
     this.quantity = ingredient.quantity;
     this.unitId = ingredient.unitId;
     this.price = ingredient.price;
-    this.userId = ingredient.userId;
   }
 }
