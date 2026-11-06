@@ -101,6 +101,13 @@ export class RecipeFormComponent implements OnInit {
     this.ingredientRows.push(this.newIngredientRow());
   }
 
+  onQuantityChange(row: RecipeIngredientRow, e: any): void {
+    const quantity = parseFloat(e.target.value);
+    row.quantity = quantity !== null && Number.isFinite(quantity)
+      ? Math.round(quantity * 100) / 100
+      : quantity;
+  }
+
   getUnitName(unitId: number | null): string {
     return this.units.find((unit) => unit.unitId === unitId)?.unitName ?? '';
   }
@@ -278,7 +285,9 @@ export class RecipeFormComponent implements OnInit {
   private isCompleteIngredientRow(row: RecipeIngredientRow): row is CompleteRecipeIngredientRow {
     return row.itemId !== null && Number.isInteger(row.itemId) &&
       row.unitId !== null && Number.isInteger(row.unitId) &&
-      row.quantity !== null && Number.isInteger(row.quantity) && row.quantity >= 1;
+      row.quantity !== null && Number.isFinite(row.quantity) &&
+      row.quantity > 0 && row.quantity <= 99999999.99 &&
+      Math.round(row.quantity * 100) / 100 === row.quantity;
   }
 
   private getErrorMessage(error: unknown, action: 'load' | 'save'): string {

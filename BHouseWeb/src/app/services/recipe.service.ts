@@ -125,7 +125,6 @@ export class RecipeService {
   }
 
   private toRecipe(value: unknown): Recipe {
-    console.log("🌺 👁 🫦 👁 🫰 ~ RecipeService ~ toRecipe ~ value:", value)
     if (!this.isRecord(value)) {
       throw new Error('The API returned an invalid recipe.');
     }
